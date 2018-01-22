@@ -1,15 +1,35 @@
-
+#################MAY NEED TO RUN#######################
+install.packages(c("rstan","Matrix"))
+###############REQUIRED PACKAGES########################
 library(rstan)
-library(maptools)
-library(spdep)
-library(INLA)
-library(zoo)
-library(LaplacesDemon)
-library(maptools)
+library(Matrix)
 
+######################READ IN DATA###########################
 
+#All Data Available at https://github.com/nick3703/Chicago-Data
 
-#####################################################################
+N.mat=readMM("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/neighborhood.mtx")
+
+pairs<-triu(N.mat)
+
+pairs<-summary(pairs)[summary(pairs)$x==1,]
+
+zs=as.matrix(read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/crime.csv")[,-1])
+
+dat<-as.numeric(zs)
+
+size=nrow(N.mat)
+
+num.obs=ncol(zs)
+#Population by Census Block Group
+pop=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/pop.csv")[,-1]
+#Percentage Unemployed by Census Block Group
+un.emp=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/unemp.csv")[,-1]
+#Centered and Scaled Average Family Income by Census Block Group (2015 Dollars)
+wealth.std=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/wealth.csv")[,-1]
+#Number of Young Males by Census Block Group (15-20 yr olds)
+ym=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/ym.csv")[,-1]
+#####################STANDARDIZE DATA################################################
 ym=(ym-mean(ym))/(sqrt(var(as.numeric(ym))))
 un.emp=(un.emp-mean(un.emp))/sqrt(var(as.numeric(un.emp))) #Standardize Covariates
 Xs<-model.matrix(~1+log(pop)+ym+wealth.stnd+un.emp)
@@ -20,6 +40,8 @@ temperature=(temperature-mean(temperature))/sqrt(var(as.numeric(temperature)))
 temp.cov=rep(temperature,6)
 trend.cov=1:72
 trend.cov=(trend.cov-mean(trend.cov))/sqrt(var(trend.cov))
+
+##################CREATE INGARCH MODEL IN STAN#############################
 
 ingarchmodel="
 data {
@@ -58,14 +80,7 @@ eta~beta(.5,.5);
 etacross~beta(.5,.5);
 
 }"
-iden=matrix(0,nrow=size,ncol=size)
-diag(iden)=1
 
-N=iden
-  
-diag(N)<-1/apply(N.mat,1,sum)
-
-A=as.matrix(N%*%N.mat)
 
 sp_d <- list(n = size,         # number of total observations
              t=num.obs,
@@ -79,6 +94,9 @@ sp_d <- list(n = size,         # number of total observations
 
 )
 
+
+###########SAMPLE FROM STAN#########
+
 ing<-stan_model(model_code=ingarchmodel)
 niter=5000
 nchains=1
@@ -89,10 +107,8 @@ sp_fit_ingar <- stan(model_code=ingarchmodel, data = sp_d,
 
 print(sp_fit_ingar, pars = c('beta', 'etacross', 'eta','lp__'))
 INGAR=extract(sp_fit_ingar,pars = c('beta', 'etacross', 'eta','lp__'))
-
-#write.csv(INGAR,"INGARchi.csv")
-
-samps=read.csv("INGARchi.csv")[,-1]
+write.csv(INGAR,"INGARchi.csv")
+samps=read.csv("INGARchi.csv")[,-1]  #Output saved as 'samps'
 
 
 
@@ -123,7 +139,7 @@ ar=c()
 test.ar=c()
 ar2=c()
 varmean=c()
-for(l in 1:500){
+for(l in 1:5000){
   o=sample(m,1)
   eta=samps$eta[sample(m,1)]
   etacross=samps$etacross[sample(m,1)]
