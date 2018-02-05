@@ -115,8 +115,8 @@ phi2[k,l] ~ normal(0,stds);
 
 beta ~ normal(0, 10);
 y ~ poisson(to_vector(lams));
-std ~ normal(0,5);
-stds ~ normal(0,5);
+std ~ cauchy(0,5);
+stds ~ cauchy(0,5);
 }"
 
 spat<-N.mat
@@ -153,7 +153,7 @@ sp_spat <- list(n = size,         # number of total observations
                 W_sparse = pairs[,1:2],
             		D_sparse=num.neighs,
                 lambda=eigs,
-	            	alpha=.9999 #Fixed Spatial Parameter at Edge of parameter space
+	            	alpha=.999 #Fixed Spatial Parameter at Edge of parameter space
 )
 
 m<-stan_model(model_code=model4)
