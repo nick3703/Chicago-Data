@@ -32,7 +32,7 @@ ym=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/ym.c
 #####################STANDARDIZE DATA################################################
 ym=(ym-mean(ym))/(sqrt(var(as.numeric(ym))))
 un.emp=(un.emp-mean(un.emp))/sqrt(var(as.numeric(un.emp))) #Standardize Covariates
-Xs<-model.matrix(~1+log(pop)+ym+wealth.stnd+un.emp)
+Xs<-model.matrix(~1+log(pop)+ym+wealth.std+un.emp)
 
 temperature=c(29,23.4,44.4,60.0,70.0,76.9,81.9,80.9,78.1,63.2,53.7,44.5) #Temperature is proxy for seasonality
 dim(temperature)=c(12,1)
