@@ -23,6 +23,7 @@ un.emp=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/
 wealth.std=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/wealth.csv")[,-1]
 #Number of Young Males by Census Block Group (15-20 yr olds)
 ym=read.csv("https://raw.githubusercontent.com/nick3703/Chicago-Data/master/ym.csv")[,-1]
+ym=(ym-mean(ym))/sqrt(var(ym))
 temperature=c(29,23.4,44.4,60.0,70.0,76.9,81.9,80.9,78.1,63.2,53.7,44.5)
 dim(temperature)=c(12,1)
 temperature=(temperature-mean(temperature))/as.numeric(sqrt(var(temperature)))
