@@ -154,19 +154,26 @@ sp_spat <- list(n = size,         # number of total observations
                 W_sparse = pairs[,1:2],
             		D_sparse=num.neighs,
                 lambda=eigs,
-	            	alpha=.999 #Fixed Spatial Parameter at Edge of parameter space
+            		alpha=0.999#Fixed Spatial Parameter at Edge of parameter space
 )
 
 m<-stan_model(model_code=model4)
 
 
 
-niter=7000
-nchains=3
+niter=4000
+nchains=1
 rstan_options(auto_write = TRUE)
 sp_fit.spat <- stan(model_code=model4, data = sp_spat, 
                     iter = niter, chains = nchains, verbose = FALSE, refresh=50)
 
-print(sp_fit.spat, pars = c('stds','beta', 'tau', 'etacross', 'eta','lp__'))
+print(sp_fit.spat, pars = c('stds','beta', 'tau', 'etacross', 'eta'))
 
-
+lams<-extract(sp_fit.spat,pars="lams")
+fit.zs<-matrix(NA,nrow=552,ncol=72)
+for(l in 1:552){
+  for(k in 1:72){
+    fit.zs[l,k]<-median(lams$lams[,l,k])
+  }
+}
+plot(zs,fit.zs)

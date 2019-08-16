@@ -45,10 +45,20 @@ x1<-rep(log(pop),72)
 x2<-rep(un.emp,72)
 x3<-rep(wealth,72)
 x4<-rep(ym,72)
+x5<-rep(trend.cov,each=552)
+x6<-rep(temp.cov,each=552)
+
 y<-as.numeric(zs)
 
-Xs=formula(y~x1+x2+x3+x4)
+Xs=formula(y~x1+x2+x3+x4+offset(-.272*x5)+offset(.164*x6))
+
+#model1<-ST.CARar(formula=Xs, family="poisson",W=as.matrix(N.mat), burnin=10000, n.sample=15000,thin=5)
+
+model1<-ST.CARanova(formula=Xs, family="poisson",W=as.matrix(N.mat), interaction=FALSE,rho.S=1,burnin=35000, n.sample=70000,thin=5)
+
+y.fit.stcar<-model1$fitted.values
+
+class(y.fit.stcar)
 
 
-model1<-ST.CARsepspatial(formula=Xs, family="poisson",W=as.matrix(N.mat), burnin=2000, n.sample=7000,thin=1)
-
+plot(y,y.fit.stcar)
