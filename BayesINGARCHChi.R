@@ -106,7 +106,7 @@ sp_fit_ingar <- stan(model_code=ingarchmodel, data = sp_d,
                     iter = niter, chains = nchains,verbose = FALSE,refresh=50)
 
 print(sp_fit_ingar, pars = c('beta', 'etacross', 'eta','lp__'))
-INGAR=extract(sp_fit_ingar,pars = c('beta', 'etacross', 'eta','lp__'))
+INGAR=rstan::extract(sp_fit_ingar,pars = c('beta', 'etacross', 'eta','lp__'))
 write.csv(INGAR,"INGARchi.csv")
 samps=read.csv("INGARchi.csv")[,-1]  #Output saved as 'samps'
 
@@ -173,7 +173,7 @@ for(l in 1:5000){
   for(k in 1:(num.obs-1)){lag1[k,k+1]=1}
   lag1[num.obs,(num.obs-1)]=1
   ar2[l]=sum(lag1*cor.mat)/num.obs
-  mors[l]=moran.test(as.numeric(zs.test),list.Neigh)$estimate[[1]]
+  mors[l]=spdep::moran.test(as.numeric(zs.test),list.Neigh)$estimate[[1]]
 }
 
 acf.base=c()
