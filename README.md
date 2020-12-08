@@ -1,6 +1,6 @@
 # Chicago-Data
 
-Data to Reproduce Analysis of Chapter 3
+Data to Reproduce Analysis of "A Class of Spatially Correlated Self-Exciting Statistical Models", by Clark and Dixon
 
 BayesINGARCHChi.R contains Rstan code for conducting Bayesian inference for an INGARCH model for Chicago Burglaries.
 
