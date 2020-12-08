@@ -1,5 +1,5 @@
-
-
+if (!require("rstan")) install.packages("rsta")
+if (!require("Matrix")) install.packages("Matrix")
 library(rstan)
 library(Matrix)
 
